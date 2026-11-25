@@ -10,7 +10,7 @@ document.addEventListener('submit',async e=>{
     try{
       const data=await api('/api/login',{method:'POST',body:JSON.stringify({username:fd.get('username'),password:fd.get('password')})});
       localStorage.setItem('adaa_session',data.token);state.user=data.user;state.page='dashboard';
-      await loadClasses();await renderPage();
+      await renderPage();
     }catch(error){
       const currentMessage=document.getElementById('auth-message');
       if(currentMessage)currentMessage.innerHTML='<div class="flash error">'+esc(error.message)+'</div>';
@@ -45,13 +45,13 @@ document.addEventListener('change',e=>{if(e.target.id==='dashboard-period'){stat
   if(e.target.matches('#evaluation-form [name="date"]'))refreshTeacherChoices(e.target.value).catch(error=>toast(error.message,'error'));
 });
 document.addEventListener('click',async e=>{
-  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','manage-classes']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
+  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
   try{
     if(action==='navigate'){state.page=el.dataset.page;state.mobileOpen=false;state.teacherId=null;await renderPage();}
     else if(action==='toggle-menu'){state.mobileOpen=!state.mobileOpen;document.getElementById('sidebar')?.classList.toggle('open',state.mobileOpen);}
     else if(action==='toggle-push-notifications'){await togglePushNotifications(el);}
     else if(action==='logout'){await api('/api/logout',{method:'POST',body:'{}'});localStorage.removeItem('adaa_session');state.user=null;state.page='dashboard';renderLogin();}
-    else if(action==='open-teacher-modal'){await openTeacherModal();}     else if(action==='manage-classes'){await addClass();}
+    else if(action==='open-teacher-modal'){await openTeacherModal();}
     else if(action==='edit-teacher'){await openTeacherModal(el.dataset.id);}
     else if(action==='delete-teacher'){
       const teacherName=el.closest('tr')?.querySelector('.teacher-cell strong')?.textContent||document.querySelector('.profile-name')?.textContent||'هذا المدرس';

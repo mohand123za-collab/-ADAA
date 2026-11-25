@@ -41,7 +41,7 @@ async function boot() {
     const session=await api('/api/session');criteria=session.criteria||criteriaDefaults;
     if(session.setupRequired){renderSetup();return;}
     if(!session.user){renderLogin();return;}
-    state.user=session.user;await loadClasses();await renderPage();
+    state.user=session.user;await renderPage();
   } catch(error) { renderLogin(error.message); }
 }
 function renderLogin(message='') {

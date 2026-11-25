@@ -27,7 +27,7 @@ async function refreshTeacherChoices(day) {
   const select=document.querySelector('#evaluation-form [name="teacherId"]');if(!select)return;
   const selected=select.value;const {teachers}=await api(`/api/teachers?date=${encodeURIComponent(day)}`);
   select.innerHTML='<option value="">اختر المدرس</option>'+teachers.map(t=>{
-    const evaluated=Boolean(t.today_evaluation_id);return `<option value="${t.id}" ${selected===String(t.id)&&!evaluated?'selected':''} ${evaluated?'disabled':''}>${esc(t.name)} · ${esc(t.gender)} · ${esc(t.circle||'بدون حلقة')}${evaluated?' · تم تقييمه في هذا التاريخ':''}</option>`;
+    const evaluated=Boolean(t.today_evaluation_id);return `<option value="${t.id}" ${selected===String(t.id)&&!evaluated?'selected':''} ${evaluated?'disabled':''}>${esc(t.name)} · ${esc(t.gender)}${evaluated?' · تم تقييمه في هذا التاريخ':''}</option>`;
   }).join('');
   if(selected&&teachers.some(t=>String(t.id)===selected&&t.today_evaluation_id))toast('هذا المدرس لديه تقييم مسجل في التاريخ المختار؛ استخدم زر «تعديل» لتغييره.','error');
 }
