@@ -11,3 +11,4 @@ async function dashboardPage() {
   return `${pageHeading('السلام عليكم، '+esc(state.user.name), 'لوحة متابعة الأداء التربوي والتعليمي · '+dateText(date),actions)}
     <div class="stats-grid">${statCard('إجمالي المدرسين',formatScore(data.totalTeachers),'إجمالي الملفات الموجودة','people')}${statCard('تقييمات اليوم',formatScore(data.todayEvaluations),'تقييم مسجل لهذا اليوم','clipboard','#89703d','#f5efdf')}${statCard('متوسط الأداء',formatPercent(data.todayAverage),data.todayAverage===null?'لا توجد نتائج بعد':'متوسط تقييمات اليوم','chart','#39754c','#e9f3e9')}${statCard('دون 70% اليوم',formatScore(data.below?.length||0),'يستلزم مراجعة وتوجيهًا','bell','#a64b40','#f9e9e6')}</div>
     <div class="dashboard-grid">${trendCard}${bestCard}</div><div class="section-grid">${latestCard}${warningsCard}</div>`;
+}
