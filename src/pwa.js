@@ -1,13 +1,52 @@
-// يتيح زر الصفحة استخدام نافذة التثبيت الأصلية، مع إرشادات للمتصفحات الأخرى.
+// يعرض زر التثبيت أسفل تسجيل الخروج ويتعامل مع نافذة التثبيت وإرشادات المتصفحات الأخرى.
 let installPromptEvent = null;
-const installAppButton = document.getElementById('install-app-button');
+let installedDuringSession = false;
+const installedFlag = 'adaa_pwa_installed';
 
-function isInstalledApp() {
+function getInstallButton() {
+  return document.getElementById('install-app-button');
+}
+
+function isStandaloneApp() {
   return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 }
 
+async function isPwaInstalled() {
+  if (installedDuringSession || isStandaloneApp()) return true;
+
+  let savedInstallFlag = false;
+  try {
+    savedInstallFlag = localStorage.getItem(installedFlag) === 'true';
+  } catch {}
+
+  if (typeof navigator.getInstalledRelatedApps === 'function') {
+    try {
+      const relatedApps = await navigator.getInstalledRelatedApps();
+      const installed = relatedApps.some(app => app.platform === 'webapp');
+      if (installed) return true;
+      if (savedInstallFlag) localStorage.removeItem(installedFlag);
+      return false;
+    } catch {
+      return savedInstallFlag;
+    }
+  }
+
+  return savedInstallFlag;
+}
+
+async function syncInstallButton() {
+  const button = getInstallButton();
+  if (!button) return;
+  if (installPromptEvent) {
+    button.hidden = false;
+    return;
+  }
+  button.hidden = await isPwaInstalled();
+}
+
 function hideInstallButton() {
-  if (installAppButton) installAppButton.hidden = true;
+  const button = getInstallButton();
+  if (button) button.hidden = true;
 }
 
 function showManualInstallGuide() {
@@ -27,15 +66,23 @@ function showManualInstallGuide() {
 window.addEventListener('beforeinstallprompt', event => {
   event.preventDefault();
   installPromptEvent = event;
-  if (installAppButton) installAppButton.hidden = false;
+  installedDuringSession = false;
+  try { localStorage.removeItem(installedFlag); } catch {}
+  const button = getInstallButton();
+  if (button) button.hidden = false;
 });
 
 window.addEventListener('appinstalled', () => {
   installPromptEvent = null;
+  installedDuringSession = true;
+  try { localStorage.setItem(installedFlag, 'true'); } catch {}
   hideInstallButton();
 });
 
-installAppButton?.addEventListener('click', async () => {
+document.addEventListener('click', async event => {
+  const button = event.target.closest('#install-app-button');
+  if (!button) return;
+
   if (!installPromptEvent) {
     showManualInstallGuide();
     return;
@@ -43,13 +90,18 @@ installAppButton?.addEventListener('click', async () => {
 
   const promptEvent = installPromptEvent;
   installPromptEvent = null;
+  button.disabled = true;
   try {
     await promptEvent.prompt();
     const choice = await promptEvent.userChoice;
-    if (choice?.outcome === 'accepted') hideInstallButton();
+    if (choice?.outcome === 'accepted') {
+      installedDuringSession = true;
+      try { localStorage.setItem(installedFlag, 'true'); } catch {}
+      hideInstallButton();
+    }
   } catch {
     showManualInstallGuide();
+  } finally {
+    if (button.isConnected) button.disabled = false;
   }
 });
-
-if (isInstalledApp()) hideInstallButton();

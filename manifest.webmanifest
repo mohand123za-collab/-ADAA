@@ -23,5 +23,17 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://adaa-rho.vercel.app/manifest.webmanifest",
+      "id": "https://adaa-rho.vercel.app/"
+    },
+    {
+      "platform": "webapp",
+      "url": "https://mohand123za-collab.github.io/-ADAA/manifest.webmanifest",
+      "id": "https://mohand123za-collab.github.io/-ADAA/"
+    }
   ]
 }

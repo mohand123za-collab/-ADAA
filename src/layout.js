@@ -17,7 +17,13 @@ function shell(content) {
     </aside>
     <main class="main">
       <header class="topbar"><div class="topbar-start"><button class="icon-btn mobile-menu" data-action="toggle-menu" aria-label="القائمة">${icon('menu')}</button><div><div class="eyebrow">معهد المجد لتحفيظ القرآن الكريم</div><div class="topbar-title">${esc(pageTitle())}</div></div></div>
-        <div class="topbar-actions"><div class="date-chip">${icon('calendar')}${esc(date)}</div><div class="user-menu">${teacherAvatar(state.user.name,'avatar')}<div><div class="user-name">${esc(state.user.name)}</div><div class="user-role">${esc(roleNames[state.user.role])}</div></div></div><button class="icon-btn" data-action="logout" title="تسجيل الخروج">${icon('logout')}</button></div>
+        <div class="topbar-actions"><div class="date-chip">${icon('calendar')}${esc(date)}</div><div class="user-menu">${teacherAvatar(state.user.name,'avatar')}<div><div class="user-name">${esc(state.user.name)}</div><div class="user-role">${esc(roleNames[state.user.role])}</div></div></div><div class="account-actions">
+          <button class="icon-btn" data-action="logout" title="تسجيل الخروج">${icon('logout')}</button>
+          <button id="install-app-button" class="install-app-button" type="button" aria-label="تثبيت التطبيق" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 16v4h14v-4"/></svg>
+            <span>تثبيت التطبيق</span>
+          </button>
+        </div></div>
       </header><section class="page">${content}</section>
     </main>
   </div>${state.modal||''}`;
@@ -63,6 +69,7 @@ async function renderPage() {
   else {state.page='dashboard';content=await dashboardPage();}
   if(version!==renderVersion||!state.user)return;
   app.innerHTML=shell(content);
+  syncInstallButton();
 }
 
 function trendChart(items,cls='chart-wrap') {

@@ -308,13 +308,16 @@ to{opacity:1;transform:translateY(0)}
 .auth-product small{display:block;font-size:10px;font-weight:400;color:#c7d9ce;margin-top:2px;letter-spacing:0}
 .auth-brand-panel .auth-product+h1{margin-top:22px}
 
-/* زر التثبيت ثابت أعلى يسار الصفحة، بما في ذلك شاشة تسجيل الدخول. */
-.install-app-button{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:calc(env(safe-area-inset-left,0px) + 12px);z-index:1000;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:var(--forest);color:#fff;box-shadow:0 8px 22px rgba(18,63,52,.22);font-size:12px;font-weight:700;white-space:nowrap;direction:rtl;transition:transform .18s,box-shadow .18s}
-.install-app-button svg{width:17px;height:17px;flex:none}
-.install-app-button:hover{transform:translateY(-1px);box-shadow:0 11px 26px rgba(18,63,52,.28)}
+/* زر التثبيت أسفل تسجيل الخروج في مجموعة أدوات الحساب. */
+.account-actions{display:flex;flex:none;flex-direction:column;align-items:center;gap:5px}
+.install-app-button{position:relative;inset:auto;z-index:auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 9px;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:var(--forest);color:#fff;box-shadow:0 5px 13px rgba(18,63,52,.18);font-size:10px;font-weight:700;line-height:1;white-space:nowrap;direction:rtl;cursor:pointer;transition:transform .18s,box-shadow .18s}
+.install-app-button svg{width:15px;height:15px;flex:none}
+.install-app-button:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(18,63,52,.25)}
 .install-app-button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .install-app-button[hidden]{display:none}
-@media(max-width:600px){.install-app-button{top:calc(env(safe-area-inset-top,0px) + 10px);left:calc(env(safe-area-inset-left,0px) + 10px);padding:8px 10px;font-size:11px}}
+.topbar{height:auto;min-height:88px}
+@media(max-width:780px){.topbar{height:auto;min-height:88px}.account-actions{gap:4px}.install-app-button{padding:6px 8px;font-size:10px}}
+@media(max-width:460px){.topbar{padding-left:9px;padding-right:9px;gap:7px}.topbar-start{gap:8px}.topbar-start .eyebrow{display:none}.topbar-actions{gap:7px}.user-menu>div{display:none}.install-app-button{padding:6px 7px;font-size:9px}}
 @media(display-mode:standalone){.install-app-button{display:none}}
 
 /* مؤشر الاتصال بالسحابة عند تهيئة الصفحة. */
