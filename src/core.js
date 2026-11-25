@@ -22,6 +22,7 @@ const iconPaths = {
   close:'<path d="m18 6-12 12M6 6l12 12"/>',
   star:'<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/>',
   check:'<path d="m5 12 4 4L19 6"/>',
+  message:'<path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L3 21l1.9-5.6A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 11h8M8 15h5"/>',
   circle:'<circle cx="12" cy="12" r="9"/>',
 };
 const criteriaDefaults = [

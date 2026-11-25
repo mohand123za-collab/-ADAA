@@ -45,7 +45,7 @@ document.addEventListener('change',e=>{if(e.target.id==='dashboard-period'){stat
   if(e.target.matches('#evaluation-form [name="date"]'))refreshTeacherChoices(e.target.value).catch(error=>toast(error.message,'error'));
 });
 document.addEventListener('click',async e=>{
-  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','delete-evaluation','delete-selected-evaluations']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
+  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','delete-evaluation','delete-selected-evaluations','open-administrative-directive','respond-administrative-directive','create-administrative-directive','save-administrative-directive-response']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
   try{
     if(action==='navigate'){state.page=el.dataset.page;state.mobileOpen=false;state.teacherId=null;await renderPage();}
     else if(action==='toggle-menu'){state.mobileOpen=!state.mobileOpen;document.getElementById('sidebar')?.classList.toggle('open',state.mobileOpen);}
@@ -86,6 +86,18 @@ document.addEventListener('click',async e=>{
       for(const key of ['strengths','weaknesses','behaviorNote','goalsNote','teachingNote','generalNote'])data[key]=fd.get(key);
       state.modalBusy=true;el.disabled=true;
       try{const result=await api('/api/evaluations',{method:'POST',body:JSON.stringify(data)});state.modalBusy=false;state.modal='';toast(result.updated?'تم تحديث تقييم هذا اليوم وسُجل التعديل.':'تم حفظ التقييم اليومي.');await renderPage();}
+      catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
+    }
+    else if(action==='open-administrative-directive')await openAdministrativeDirectiveModal();
+    else if(action==='respond-administrative-directive')await openAdministrativeDirectiveResponse(el.dataset.id);
+    else if(action==='create-administrative-directive'){
+      if(state.modalBusy)return;const form=document.getElementById('administrative-directive-form');if(!form.reportValidity())return;state.modalBusy=true;el.disabled=true;const fd=new FormData(form);
+      try{await api('/api/directives',{method:'POST',body:JSON.stringify({content:fd.get('content'),teacherId:fd.get('teacherId')||null})});state.modalBusy=false;state.modal='';toast('تم إرسال التوجيه الإداري وحفظه.');await renderPage();}
+      catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
+    }
+    else if(action==='save-administrative-directive-response'){
+      if(state.modalBusy)return;const form=document.getElementById('administrative-directive-response-form');if(!form.reportValidity())return;state.modalBusy=true;el.disabled=true;const fd=new FormData(form);
+      try{await api(`/api/directives/${el.dataset.id}`,{method:'PUT',body:JSON.stringify({status:fd.get('status'),response:fd.get('response')})});state.modalBusy=false;state.modal='';toast('تم حفظ الرد وتحديث حالة التنفيذ.');await renderPage();}
       catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
     }
     else if(action==='open-profile'){state.teacherId=el.dataset.id;state.page='profile';await renderPage();}

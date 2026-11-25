@@ -9,6 +9,18 @@ async function openTeacherModal(id=null) {
   app.insertAdjacentHTML('beforeend',state.modal);state.modal='';
 }
 
+async function openAdministrativeDirectiveModal() {
+  const {teachers=[]}=await api('/api/teachers');
+  const content=`<form id="administrative-directive-form"><div class="field"><label for="directive-teacher">المستلم</label><select id="directive-teacher" name="teacherId"><option value="">توجيه عام لرئيس الشؤون</option>${teachers.map(t=>`<option value="${t.id}">${esc(t.name)} · ${esc(t.gender)}</option>`).join('')}</select><small class="record-muted">اختر مدرسًا لجعل التوجيه خاصًا به، أو اترك الاختيار توجيهًا عامًا.</small></div><div class="field" style="margin-top:14px"><label for="administrative-directive-content">نص التوجيه *</label><textarea id="administrative-directive-content" name="content" maxlength="4000" required placeholder="اكتب التوجيه الإداري…"></textarea></div><div id="form-error"></div></form>`;
+  app.insertAdjacentHTML('beforeend',modalWrap('إرسال توجيه إداري',content,`<button class="btn btn-primary" data-action="create-administrative-directive">إرسال التوجيه</button><button class="btn btn-secondary" data-action="close-modal">إلغاء</button>`));
+}
+async function openAdministrativeDirectiveResponse(id) {
+  const {directives=[]}=await api('/api/directives');const directive=directives.find(item=>Number(item.id)===Number(id));
+  if(!directive){toast('لم يتم العثور على التوجيه.','error');return;}
+  const statuses=[['pending','بانتظار التنفيذ'],['in_progress','قيد التنفيذ'],['completed','مكتمل']];
+  const content=`<div class="directive-modal-summary"><strong>${directive.teacherName?`توجيه خاص · ${esc(directive.teacherName)}`:'توجيه عام'}</strong><p>${esc(directive.content)}</p></div><form id="administrative-directive-response-form"><div class="field"><label for="directive-status">حالة التنفيذ *</label><select id="directive-status" name="status" required>${statuses.map(([value,label])=>`<option value="${value}" ${directive.status===value?'selected':''}>${label}</option>`).join('')}</select></div><div class="field" style="margin-top:14px"><label for="directive-response">الرد أو ملاحظات التنفيذ</label><textarea id="directive-response" name="response" maxlength="4000" placeholder="اكتب الرد أو ما تم تنفيذه…">${esc(directive.response||'')}</textarea></div><div id="form-error"></div></form>`;
+  app.insertAdjacentHTML('beforeend',modalWrap('تحديث التوجيه الإداري',content,`<button class="btn btn-primary" data-action="save-administrative-directive-response" data-id="${directive.id}">حفظ الرد والحالة</button><button class="btn btn-secondary" data-action="close-modal">إلغاء</button>`));
+}
 async function openEvaluationModal(teacherId=null,date=null,editId=null) {
   const existing=editId?(await api(`/api/evaluations/${editId}`)).evaluation:null;
   const chosen=existing?.teacherId||teacherId||'';const d=existing?.date||date||dateInputValue();

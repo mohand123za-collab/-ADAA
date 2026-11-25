@@ -4,6 +4,7 @@ function navItems() { return [
   {key:'evaluations',label:'التقييمات اليومية',icon:'clipboard'},
   {key:'warnings',label:'سجل الإنذارات',icon:'bell',count:state.dashboard?.warningCount||0},
   {key:'reports',label:'التقارير',icon:'report'},
+  {key:'directives',label:'التوجيهات الإدارية',icon:'message'},
 ]; }
 function pageTitle() { const item=navItems().find(x=>x.key===state.page);if(item)return item.label;if(state.page==='profile')return 'ملف المدرس';return 'لوحة التحكم'; }
 function shell(content) {
@@ -69,6 +70,7 @@ async function renderPage() {
   else if(state.page==='evaluations')content=await evaluationsPage();
   else if(state.page==='warnings')content=await warningsPage();
   else if(state.page==='reports')content=await reportsPage();
+  else if(state.page==='directives')content=await directivesPage();
   else {state.page='dashboard';content=await dashboardPage();}
   if(version!==renderVersion||!state.user)return;
   app.innerHTML=shell(content);
