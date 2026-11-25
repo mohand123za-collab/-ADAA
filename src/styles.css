@@ -308,3 +308,11 @@ to{opacity:1;transform:translateY(0)}
 .auth-product small{display:block;font-size:10px;font-weight:400;color:#c7d9ce;margin-top:2px;letter-spacing:0}
 .auth-brand-panel .auth-product+h1{margin-top:22px}
 
+/* زر التثبيت ثابت أعلى يسار الصفحة، بما في ذلك شاشة تسجيل الدخول. */
+.install-app-button{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:calc(env(safe-area-inset-left,0px) + 12px);z-index:1000;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:var(--forest);color:#fff;box-shadow:0 8px 22px rgba(18,63,52,.22);font-size:12px;font-weight:700;white-space:nowrap;direction:rtl;transition:transform .18s,box-shadow .18s}
+.install-app-button svg{width:17px;height:17px;flex:none}
+.install-app-button:hover{transform:translateY(-1px);box-shadow:0 11px 26px rgba(18,63,52,.28)}
+.install-app-button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.install-app-button[hidden]{display:none}
+@media(max-width:600px){.install-app-button{top:calc(env(safe-area-inset-top,0px) + 10px);left:calc(env(safe-area-inset-left,0px) + 10px);padding:8px 10px;font-size:11px}}
+@media(display-mode:standalone){.install-app-button{display:none}}
