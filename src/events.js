@@ -1,13 +1,30 @@
 document.addEventListener('submit',async e=>{
   if(e.target.id==='login-form'){
-    e.preventDefault();const fd=new FormData(e.target);const msg=document.getElementById('auth-message');
-    try{const data=await api('/api/login',{method:'POST',body:JSON.stringify({username:fd.get('username'),password:fd.get('password')})});localStorage.setItem('adaa_session',data.token);state.user=data.user;state.page='dashboard';await loadClasses();await renderPage();}
-    catch(error){if(msg)msg.innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
+    e.preventDefault();
+    const form=e.target;
+    if(form.dataset.submitting==='1')return;
+    form.dataset.submitting='1';
+    const fd=new FormData(form);
+    const button=form.querySelector('button[type="submit"]');
+    if(button){button.disabled=true;button.setAttribute('aria-busy','true');button.innerHTML='<span class="loading-spinner" aria-hidden="true"></span><span>جارٍ تسجيل الدخول…</span>';}
+    try{
+      const data=await api('/api/login',{method:'POST',body:JSON.stringify({username:fd.get('username'),password:fd.get('password')})});
+      localStorage.setItem('adaa_session',data.token);state.user=data.user;state.page='dashboard';
+      await loadClasses();await renderPage();
+    }catch(error){
+      const currentMessage=document.getElementById('auth-message');
+      if(currentMessage)currentMessage.innerHTML='<div class="flash error">'+esc(error.message)+'</div>';
+    }finally{
+      if(form.isConnected){
+        delete form.dataset.submitting;
+        if(button){button.disabled=false;button.removeAttribute('aria-busy');button.innerHTML='تسجيل الدخول '+icon('arrow');}
+      }
+    }
   }
   if(e.target.id==='setup-form'){
     e.preventDefault();const fd=new FormData(e.target);const data={chair:{name:fd.get('chairName'),username:fd.get('chairUsername'),password:fd.get('chairPassword')},director:{name:fd.get('directorName'),username:fd.get('directorUsername'),password:fd.get('directorPassword')}};const msg=document.getElementById('auth-message');
     try{await api('/api/setup',{method:'POST',body:JSON.stringify(data)});toast('تم إنشاء الحسابين. سجّل الدخول للمتابعة.');renderLogin('اكتمل الإعداد الأولي. سجّل الدخول بحسابك.');}
-    catch(error){if(msg)msg.innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
+    catch(error){if(msg)msg.innerHTML='<div class="flash error">'+esc(error.message)+'</div>';}
   }
 });
 document.addEventListener('input',e=>{
