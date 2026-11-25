@@ -23,6 +23,9 @@ function shell(content) {
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 16v4h14v-4"/></svg>
             <span>تثبيت التطبيق</span>
           </button>
+          <button id="push-notifications-button" class="push-notifications-button" type="button" data-action="toggle-push-notifications" aria-label="تفعيل تنبيهات التقييم">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><span>تفعيل تنبيهات التقييم</span>
+          </button>
         </div></div>
       </header><section class="page">${content}</section>
     </main>
@@ -70,6 +73,7 @@ async function renderPage() {
   if(version!==renderVersion||!state.user)return;
   app.innerHTML=shell(content);
   syncInstallButton();
+  syncPushButton();
 }
 
 function trendChart(items,cls='chart-wrap') {

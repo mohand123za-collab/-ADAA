@@ -315,9 +315,15 @@ to{opacity:1;transform:translateY(0)}
 .install-app-button:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(18,63,52,.25)}
 .install-app-button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .install-app-button[hidden]{display:none}
+.push-notifications-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:6px 9px;border:1px solid var(--line);border-radius:10px;background:#edf3ed;color:var(--forest);font-size:10px;font-weight:700;line-height:1;white-space:nowrap;direction:rtl;cursor:pointer;transition:transform .18s,box-shadow .18s}
+.push-notifications-button svg{width:15px;height:15px;flex:none}
+.push-notifications-button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 12px rgba(18,63,52,.12)}
+.push-notifications-button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.push-notifications-button:disabled{opacity:.65;cursor:not-allowed}
+.push-notifications-button[hidden]{display:none}
 .topbar{height:auto;min-height:88px}
-@media(max-width:780px){.topbar{height:auto;min-height:88px}.account-actions{gap:4px}.install-app-button{padding:6px 8px;font-size:10px}}
-@media(max-width:460px){.topbar{padding-left:9px;padding-right:9px;gap:7px}.topbar-start{gap:8px}.topbar-start .eyebrow{display:none}.topbar-actions{gap:7px}.user-menu>div{display:none}.install-app-button{padding:6px 7px;font-size:9px}}
+@media(max-width:780px){.topbar{height:auto;min-height:88px}.account-actions{gap:4px}.install-app-button,.push-notifications-button{padding:6px 8px;font-size:10px}}
+@media(max-width:460px){.topbar{padding-left:9px;padding-right:9px;gap:7px}.topbar-start{gap:8px}.topbar-start .eyebrow{display:none}.topbar-actions{gap:7px}.user-menu>div{display:none}.install-app-button,.push-notifications-button{padding:6px 7px;font-size:9px}}
 @media(display-mode:standalone){.install-app-button{display:none}}
 
 /* مؤشر الاتصال بالسحابة عند تهيئة الصفحة. */
