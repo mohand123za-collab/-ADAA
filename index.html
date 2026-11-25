@@ -205,7 +205,7 @@ function teacherRowHtml(t) {
 }
 
 async function profilePage() {
-  const {teacher:t,evaluations,warnings,weeks,months}=await api(`/api/teachers/${state.teacherId}`);
+  const {teacher:t,evaluations=[],warnings=[],weeks=[],months=[]}=await api(`/api/teachers/${state.teacherId}`);
   const todayEvaluations=evaluations.length;
   const avg=evaluations.length?evaluations.reduce((sum,e)=>sum+Number(e.score),0)/evaluations.length:null;
   const currentWeek=weeks.filter(w=>w.period===weekStart(dateInputValue()))[0]?.average;
@@ -296,7 +296,7 @@ function auditSummary(row) {
   return changes.length?changes.map(esc).join(' · '):'تم تحديث بيانات التقييم والملاحظات.';
 }
 async function openWhy(id) {
-  const {evaluation:e,audit,previous,warnings}=await api(`/api/evaluations/${id}`);
+  const {evaluation:e,audit=[],previous=[],warnings=[]}=await api(`/api/evaluations/${id}`);
   const rows=criteria.map(c=>{const item=e.criteria[c.key]||{};return `<div class="detail-criterion"><span>${esc(c.label)}</span><strong>${formatScore(item.score)} / ${c.max}</strong><small>${item.comment?`ملاحظة: ${esc(item.comment)}`:'—'}${item.deductionReason?`<br><b class="reason-text">سبب الخصم: ${esc(item.deductionReason)}</b>`:''}</small></div>`}).join('');
   const auditHtml=audit.length?audit.map(a=>`<div class="audit-item"><b>${esc(a.action)}</b> · ${esc(a.actor_name)}<br>${new Intl.DateTimeFormat('ar-EG',{dateStyle:'medium',timeStyle:'short'}).format(new Date(a.created_at.replace(' ','T')+'Z'))}<br>${auditSummary(a)}</div>`).join(''):'<div class="record-muted">لا يوجد تعديل سابق على هذا التقييم.</div>';
   const previousHtml=previous.length?previous.map(p=>`<div class="quick-item">${teacherAvatar(e.teacherName)}<div class="quick-info"><div class="quick-name">${dateText(p.date)}</div><div class="quick-meta">تقييم سابق · ${esc(p.evaluatorName)}</div></div><span class="score ${classScore(p.score)}">${formatPercent(p.score)}</span></div>`).join(''):'<div class="record-muted">لا توجد تقييمات أسبق.</div>';
