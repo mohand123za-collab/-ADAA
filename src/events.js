@@ -49,6 +49,7 @@ document.addEventListener('click',async e=>{
   try{
     if(action==='navigate'){state.page=el.dataset.page;state.mobileOpen=false;state.teacherId=null;await renderPage();}
     else if(action==='toggle-menu'){state.mobileOpen=!state.mobileOpen;document.getElementById('sidebar')?.classList.toggle('open',state.mobileOpen);}
+    else if(action==='toggle-push-notifications'){await togglePushNotifications(el);}
     else if(action==='logout'){await api('/api/logout',{method:'POST',body:'{}'});localStorage.removeItem('adaa_session');state.user=null;state.page='dashboard';renderLogin();}
     else if(action==='open-teacher-modal'){await openTeacherModal();}     else if(action==='manage-classes'){await addClass();}
     else if(action==='edit-teacher'){await openTeacherModal(el.dataset.id);}
