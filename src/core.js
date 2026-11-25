@@ -51,7 +51,7 @@ function toast(message,type='') { const el=document.createElement('div');el.clas
 const SUPABASE_FUNCTION_URL='https://umxznkskctubakjyjqpv.supabase.co/functions/v1/adaa-api';
 
 
-const defaultClasses=['تمهيدي','الصف الاول اولاد','الصف الاول بنات','الصف الثاني اولاد','الصف الثاني بنات','الصف الثالث اولاد','الصف الثالث بنات','الصف الرابع اولاد','الصف الرابع البنات','الصف الخامس اولاد','الصف الخامس بنات','التأهيلي'];
+const defaultClasses=['تمهيدي','فصل الاول اولاد','فصل الاول بنات','فصل الثاني اولاد','فصل الثاني بنات','فصل الثالث اولاد','فصل الثالث بنات','فصل الرابع اولاد','فصل الرابع البنات','فصل الخامس اولاد','فصل الخامس بنات','التأهيلي'];
 let classNames=[...defaultClasses];
 async function loadClasses(){try{const {classes}=await api('/api/classes');if(Array.isArray(classes)&&classes.length)classNames=[...new Set(classes.map(x=>x.name))];}catch{} }
 function classOptions(current=''){return '<option value="">اختر الحلقة</option>'+classNames.map(x=>`<option value="${esc(x)}" ${x===current?'selected':''}>${esc(x)}</option>`).join('');}
