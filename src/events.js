@@ -45,7 +45,7 @@ document.addEventListener('change',e=>{if(e.target.id==='dashboard-period'){stat
   if(e.target.matches('#evaluation-form [name="date"]'))refreshTeacherChoices(e.target.value).catch(error=>toast(error.message,'error'));
 });
 document.addEventListener('click',async e=>{
-  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
+  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','delete-evaluation','delete-selected-evaluations']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
   try{
     if(action==='navigate'){state.page=el.dataset.page;state.mobileOpen=false;state.teacherId=null;await renderPage();}
     else if(action==='toggle-menu'){state.mobileOpen=!state.mobileOpen;document.getElementById('sidebar')?.classList.toggle('open',state.mobileOpen);}
@@ -66,6 +66,19 @@ document.addEventListener('click',async e=>{
     }
     else if(action==='open-evaluation-modal'){await openEvaluationModal(el.dataset.teacherId||null);}
     else if(action==='edit-evaluation'){const id=el.dataset.id;document.querySelector('.modal-backdrop')?.remove();await openEvaluationModal(null,null,id);}
+    else if(action==='delete-evaluation'){
+      const teacher=el.dataset.teacherName||'هذا المدرس',date=el.dataset.date||'';
+      if(!window.confirm(`حذف تقييم «${teacher}» بتاريخ ${date}؟ سيُحذف معه الإنذار وسجل التعديلات المرتبطان به.`))return;
+      await api(`/api/evaluations/${el.dataset.id}`,{method:'DELETE'});
+      toast('تم حذف التقييم.');await renderPage();
+    }
+    else if(action==='delete-selected-evaluations'){
+      const ids=[...document.querySelectorAll('[data-evaluation-select]:checked')].map(box=>Number(box.value));
+      if(!ids.length)return;
+      if(!window.confirm(`حذف ${ids.length} تقييمًا محددًا مع الإنذارات وسجل التعديلات المرتبط بها؟ لا يمكن التراجع عن الحذف.`))return;
+      const result=await api('/api/evaluations/bulk-delete',{method:'POST',body:JSON.stringify({ids})});
+      toast(`تم حذف ${result.deleted||ids.length} تقييمًا.`);await renderPage();
+    }
     else if(action==='save-evaluation'){
       if(state.modalBusy)return;const form=document.getElementById('evaluation-form');if(!form.reportValidity())return;
       const fd=new FormData(form);const saveButton=document.querySelector('[data-action="save-evaluation"]');const data={teacherId:Number(fd.get('teacherId')),date:fd.get('date'),replace:saveButton?.dataset.replace==='1',criteria:{}};
@@ -89,6 +102,12 @@ document.addEventListener('click',async e=>{
     else if(action==='export-csv')await exportCsv();
     else if(action==='print-report')window.print();
   }catch(error){if(error.message!=='انتهت الجلسة.')toast(error.message,'error');}finally{if(el.dataset.busy==='1'){el.dataset.busy='0';el.classList.remove('is-busy');el.removeAttribute('aria-busy');if(el.isConnected&&!el.closest('.modal-backdrop'))el.disabled=false;}}
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='select-all-evaluations'){
+    document.querySelectorAll('[data-evaluation-select]').forEach(box=>{box.checked=e.target.checked;});
+    updateEvaluationSelection();
+  }else if(e.target.matches?.('[data-evaluation-select]'))updateEvaluationSelection();
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){const modal=document.querySelector('.modal-backdrop');if(modal){modal.remove();state.modal='';}else if(state.mobileOpen){state.mobileOpen=false;document.getElementById('sidebar')?.classList.remove('open');}}});
 setInterval(async()=>{

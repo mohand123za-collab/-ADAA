@@ -335,3 +335,9 @@ to{opacity:1;transform:translateY(0)}
 @keyframes adaa-loading-spin{to{transform:rotate(360deg)}}
 .auth-form .btn[aria-busy="true"]{cursor:wait;transform:none}
 @media(prefers-reduced-motion:reduce){.boot-spinner,.loading-spinner{animation-duration:2s}}
+
+
+/* تحديد تقييمات لحذفها دفعة واحدة. */
+.eval-select-cell{width:42px;text-align:center}
+.evaluation-select{width:17px;height:17px;margin:0;accent-color:var(--forest);vertical-align:middle;cursor:pointer}
+#delete-selected-evaluations:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
