@@ -71,13 +71,13 @@ function initial(name='') { return [...String(name).trim()][0]||'م'; }
 function teacherAvatar(name,cls='teacher-initial') { return `<span class="${cls}">${esc(initial(name))}</span>`; }
 function toast(message,type='') { const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=message;document.getElementById('toast-region').append(el);setTimeout(()=>el.remove(),3800); }
 const SUPABASE_FUNCTION_URL='https://umxznkskctubakjyjqpv.supabase.co/functions/v1/adaa-api';
-const SUPABASE_REST_URL='https://umxznkskctubakjyjqpv.supabase.co/rest/v1';
-const SUPABASE_ANON_KEY='sb_publishable_NIM905Zu2JnbKmsRcHwyEA_Vqqcb37F';
+
+
 const defaultClasses=['تمهيدي','الصف الاول اولاد','الصف الاول بنات','الصف الثاني اولاد','الصف الثاني بنات','الصف الثالث اولاد','الصف الثالث بنات','الصف الرابع اولاد','الصف الرابع البنات','الصف الخامس اولاد','الصف الخامس بنات','التأهيلي'];
 let classNames=[...defaultClasses];
-async function loadClasses(){try{const r=await fetch(SUPABASE_REST_URL+'/classes?select=name&order=id',{headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY}});if(r.ok){const rows=await r.json();classNames=[...new Set(rows.map(x=>x.name))];}}catch{} }
+async function loadClasses(){try{const {classes}=await api('/api/classes');if(Array.isArray(classes)&&classes.length)classNames=[...new Set(classes.map(x=>x.name))];}catch{} }
 function classOptions(current=''){return '<option value="">اختر الحلقة</option>'+classNames.map(x=>`<option value="${esc(x)}" ${x===current?'selected':''}>${esc(x)}</option>`).join('');}
-async function addClass(){if(state.user?.role!=='chair')return;const name=window.prompt('اكتب اسم الفصل الجديد');if(!name?.trim())return;const r=await fetch(SUPABASE_REST_URL+'/classes',{method:'POST',headers:{apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({name:name.trim()})});if(!r.ok){toast('تعذر إضافة الفصل أو أنه موجود مسبقًا.','error');return;}await loadClasses();toast('تمت إضافة الفصل الجديد.');}
+async function addClass(){if(state.user?.role!=='chair')return;const name=window.prompt('اكتب اسم الفصل الجديد');if(!name?.trim())return;await api('/api/classes',{method:'POST',body:JSON.stringify({name:name.trim()})});await loadClasses();toast('تمت إضافة الفصل الجديد.');}
 
 const apiCache=new Map();
 const apiInflight=new Map();
@@ -133,7 +133,7 @@ async function boot() {
     const session=await api('/api/session');criteria=session.criteria||criteriaDefaults;
     if(session.setupRequired){renderSetup();return;}
     if(!session.user){renderLogin();return;}
-    state.user=session.user;await renderPage();
+    state.user=session.user;await loadClasses();await renderPage();
   } catch(error) { renderLogin(error.message); }
 }
 function renderLogin(message='') {
@@ -352,7 +352,7 @@ async function refreshTeacherChoices(day) {
 document.addEventListener('submit',async e=>{
   if(e.target.id==='login-form'){
     e.preventDefault();const fd=new FormData(e.target);const msg=document.getElementById('auth-message');
-    try{const data=await api('/api/login',{method:'POST',body:JSON.stringify({username:fd.get('username'),password:fd.get('password')})});localStorage.setItem('adaa_session',data.token);state.user=data.user;state.page='dashboard';await renderPage();}
+    try{const data=await api('/api/login',{method:'POST',body:JSON.stringify({username:fd.get('username'),password:fd.get('password')})});localStorage.setItem('adaa_session',data.token);state.user=data.user;state.page='dashboard';await loadClasses();await renderPage();}
     catch(error){if(msg)msg.innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
   }
   if(e.target.id==='setup-form'){
