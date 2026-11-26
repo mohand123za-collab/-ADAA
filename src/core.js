@@ -1,6 +1,6 @@
 const app = document.getElementById('app');
 const state = { user:null, page:'dashboard', teacherId:null, modal:null, modalBusy:false, mobileOpen:false, report:null, dashboard:null };
-const roleNames = { chair:'رئيس شؤون المعلمين والمعلمات', director:'المدير العام' };
+const roleNames = { chair:'مدير المطبخ', director:'المدير العام' };
 const iconPaths = {
   grid:'<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/>',
   people:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -26,13 +26,14 @@ const iconPaths = {
   circle:'<circle cx="12" cy="12" r="9"/>',
 };
 const criteriaDefaults = [
-  {key:'respect',label:'حسن التعامل والأدب مع الطلاب',max:10},
-  {key:'rolemodel',label:'التأثير التربوي والأخلاقي والقدوة الحسنة',max:10},
-  {key:'discipline',label:'الانضباط والالتزام',max:10},
-  {key:'goals',label:'تحقيق الأهداف التعليمية اليومية',max:10},
-  {key:'teaching',label:'الكفاءة التعليمية وجودة التدريس',max:10},
-  {key:'growth',label:'تطوير النفس والتعلم المستمر',max:10},
-  {key:'classroom',label:'إدارة الحلقة وضبط الطلاب',max:10},
+  {key:'hygiene',label:'النظافة الشخصية ونظافة الزي',max:10},
+  {key:'workstation',label:'نظافة وترتيب منطقة العمل',max:10},
+  {key:'foodSafety',label:'الالتزام بسلامة الغذاء',max:10},
+  {key:'quality',label:'جودة إعداد وتقديم الطعام',max:10},
+  {key:'speed',label:'سرعة الإنجاز وإدارة وقت الوردية',max:10},
+  {key:'attendance',label:'الحضور والانضباط والالتزام بالتعليمات',max:10},
+  {key:'teamwork',label:'التعاون مع فريق المطبخ',max:10},
+  {key:'waste',label:'تقليل الهدر والمحافظة على الأدوات',max:10},
 ];
 let criteria = criteriaDefaults;
 
@@ -45,7 +46,7 @@ function formatPercent(score) { return score===null||score===undefined||score===
 function classScore(s) { return Number(s)<7?'low':Number(s)>=9?'gold':''; }
 function gradeClass(score) { return Number(score)<7?'low':Number(score)<8?'medium':'good'; }
 function gradePill(e) { const label=e.warning?'إنذار':e.grade||gradeLabel(e.score);return `<span class="pill ${gradeClass(e.score)}">${e.warning?'<span class="warning-dot"></span>':''}${esc(label)}</span>`; }
-function gradeLabel(score) { const n=Number(score);return n>=9?'ممتاز':n>=8?'جيد جدًا':n>=7?'جيد':'إنذار تلقائي'; }
+function gradeLabel(score) { const n=Number(score);return n>=9?'ممتاز':n>=8?'جيد جدًا':n>=7?'جيد':'تنبيه تلقائي'; }
 function initial(name='') { return [...String(name).trim()][0]||'م'; }
 function teacherAvatar(name,cls='teacher-initial') { return `<span class="${cls}">${esc(initial(name))}</span>`; }
 function toast(message,type='') { const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=message;document.getElementById('toast-region').append(el);setTimeout(()=>el.remove(),3800); }
@@ -78,6 +79,6 @@ async function criteriaApi(path,options={}) {
   const session=localStorage.getItem('adaa_session');
   const response=await fetch(CRITERIA_FUNCTION_URL+path,{...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(session?{'x-adaa-session':session}:{}),...(options.headers||{})}});
   const type=response.headers.get('Content-Type')||'';const result=type.includes('json')?await response.json():{};
-  if(!response.ok)throw new Error(result.error||'تعذر إدارة خيارات التقييم.');
+  if(!response.ok)throw new Error(result.error||'تعذر إدارة معايير التقييم.');
   return result;
 }
