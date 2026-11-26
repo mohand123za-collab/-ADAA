@@ -1,4 +1,4 @@
-:root{--forest:#3d2b1f;--forest-2:#6e452b;--forest-3:#f3eee9;--gold:#d7833b;--gold-light:#fae6d4;--ink:#2f241d;--muted:#7d756d;--paper:#fcfaf7;--white:#fff;--line:#eee2d7;--red:#a64b40;--red-bg:#f9e9e6;--green:#657a43;--green-bg:#edf2e4;--shadow:0 16px 40px rgba(61,43,31,.10);font-family:'IBM Plex Sans Arabic',Tahoma,'Segoe UI',sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
+:root{--forest:#123f34;--forest-2:#1d5748;--forest-3:#e9f1eb;--gold:#bc914a;--gold-light:#f4ead3;--ink:#25332d;--muted:#748078;--paper:#fbfaf6;--white:#fff;--line:#e7e8e1;--red:#a64b40;--red-bg:#f9e9e6;--green:#39754c;--green-bg:#e9f3e9;--shadow:0 16px 40px rgba(30,45,35,.08);font-family:'IBM Plex Sans Arabic',Tahoma,'Segoe UI',sans-serif;color:var(--ink);background:var(--paper);font-synthesis:none}
 *{box-sizing:border-box}
 body{margin:0;min-width:320px;min-height:100vh}
 button,input,select,textarea{font:inherit}

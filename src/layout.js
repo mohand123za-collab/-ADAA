@@ -1,24 +1,24 @@
 function navItems() { return [
   {key:'dashboard',label:'لوحة التحكم',icon:'grid'},
-  {key:'teachers',label:'فريق المطبخ',icon:'people'},
+  {key:'teachers',label:'ملفات المدرسين',icon:'people'},
   {key:'evaluations',label:'التقييمات اليومية',icon:'clipboard'},
-  {key:'warnings',label:'التنبيهات',icon:'bell',count:state.dashboard?.warningCount||0},
+  {key:'warnings',label:'سجل الإنذارات',icon:'bell',count:state.dashboard?.warningCount||0},
   {key:'reports',label:'التقارير',icon:'report'},
-  {key:'directives',label:'التوجيهات التشغيلية',icon:'message'},
-  ...(['chair','director'].includes(state.user?.role)?[{key:'administration',label:'الإدارة',icon:'shield'}]:[]),
+  {key:'directives',label:'التوجيهات الإدارية',icon:'message'},
+  ...(state.user?.role==='director'?[{key:'administration',label:'الإدارة',icon:'shield'}]:[]),
 ]; }
-function pageTitle() { const item=navItems().find(x=>x.key===state.page);if(item)return item.label;if(state.page==='profile')return 'ملف العامل';return 'لوحة التحكم'; }
+function pageTitle() { const item=navItems().find(x=>x.key===state.page);if(item)return item.label;if(state.page==='profile')return 'ملف المدرس';return 'لوحة التحكم'; }
 function shell(content) {
   const nav=navItems().map(item=>`<button class="nav-btn ${state.page===item.key||state.page==='profile'&&item.key==='teachers'?'active':''}" data-action="navigate" data-page="${item.key}">${icon(item.icon)}<span>${item.label}</span>${item.count?`<span class="nav-count">${item.count>9?'9+':item.count}</span>`:''}</button>`).join('');
   const date=new Intl.DateTimeFormat('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date());
   return `<div class="app-shell">
     <aside class="sidebar ${state.mobileOpen?'open':''}" id="sidebar">
-      <div class="brand"><img class="brand-logo" src="${BRAND_LOGO_SMALL}" alt="شعار مطبخ الإدارة المركزي"><span><div class="brand-name">مذاق <span class="brand-divider">|</span> MATHAQ</div><div class="brand-sub">مطبخ الإدارة المركزي · إدارة أداء المطبخ</div></span></div>
+      <div class="brand"><img class="brand-logo" src="${BRAND_LOGO_SMALL}" alt="شعار معهد المجد"><span><div class="brand-name">أداء <span class="brand-divider">|</span> ADAA</div><div class="brand-sub">معهد المجد · إدارة الأداء التعليمي</div></span></div>
       <div class="nav-label">القائمة الرئيسية</div><nav class="nav">${nav}</nav>
-      <div class="sidebar-bottom"><div class="institution-label">مطبخ الإدارة المركزي<br>بوابة إدارة أداء المطبخ والتطوير</div></div>
+      <div class="sidebar-bottom"><div class="institution-label">معهد المجد لتحفيظ القرآن الكريم<br>بوابة متابعة الأداء والتطوير</div><div class="sidebar-note">﴿ إِنَّ هَذَا الْقُرْآنَ يَهْدِي لِلَّتِي هِيَ أَقْوَمُ ﴾</div></div>
     </aside>
     <main class="main">
-      <header class="topbar"><div class="topbar-start"><button class="icon-btn mobile-menu" data-action="toggle-menu" aria-label="القائمة">${icon('menu')}</button><div><div class="eyebrow">مطبخ الإدارة المركزي</div><div class="topbar-title">${esc(pageTitle())}</div></div></div>
+      <header class="topbar"><div class="topbar-start"><button class="icon-btn mobile-menu" data-action="toggle-menu" aria-label="القائمة">${icon('menu')}</button><div><div class="eyebrow">معهد المجد لتحفيظ القرآن الكريم</div><div class="topbar-title">${esc(pageTitle())}</div></div></div>
         <div class="topbar-actions"><div class="date-chip">${icon('calendar')}${esc(date)}</div><div class="user-menu">${teacherAvatar(state.user.name,'avatar')}<div><div class="user-name">${esc(state.user.name)}</div><div class="user-role">${esc(roleNames[state.user.role])}</div></div></div><div class="account-actions">
           <button class="icon-btn" data-action="logout" title="تسجيل الخروج">${icon('logout')}</button>
           <button id="install-app-button" class="install-app-button" type="button" aria-label="تثبيت التطبيق" hidden>
@@ -48,13 +48,13 @@ async function boot() {
 }
 function renderLogin(message='') {
   state.user=null;state.modal='';
-  app.innerHTML=`<main class="auth-screen"><section class="auth-layout"><div class="auth-brand-panel"><img class="auth-logo" src="${BRAND_LOGO_LARGE}" alt="شعار مطبخ الإدارة المركزي"><div class="auth-product">مذاق <span>|</span> MATHAQ<small>بوابة إدارة أداء المطبخ التشغيلي</small></div><h1>تشغيلٌ متقن<br>لفريق المطبخ</h1><p>منظومة متكاملة لمتابعة جودة العمل، وتقدير أثر العمل، ومساندة العامل في يومه التشغيلي.</p><div class="auth-values"><div class="auth-value">${icon('check')} تقييم يومي بمعايير واضحة وعادلة</div><div class="auth-value">${icon('check')} متابعة النمو المهني والتشغيلي</div><div class="auth-value">${icon('check')} سجل منظم للملفات والتقارير</div></div></div>
-    <div class="auth-form-panel"><h2>مرحبًا بعودتك</h2><p class="auth-lead">سجّل الدخول إلى بوابة إدارة أداء المطبخ.</p><form class="auth-form" id="login-form"><div class="field"><label for="username">اسم المستخدم</label><input id="username" name="username" autocomplete="username" required placeholder="أدخل اسم المستخدم"></div><div class="field"><label for="password">كلمة المرور</label><input id="password" name="password" type="password" autocomplete="current-password" required placeholder="أدخل كلمة المرور"></div><button class="btn btn-primary" type="submit">تسجيل الدخول ${icon('arrow')}</button><div id="auth-message">${message?`<div class="flash error">${esc(message)}</div>`:''}</div></form><div class="auth-lock">${icon('shield')} وصول خاص بحسابَي الإدارة المعتمدين</div></div></section></main>`;
+  app.innerHTML=`<main class="auth-screen"><section class="auth-layout"><div class="auth-brand-panel"><img class="auth-logo" src="${BRAND_LOGO_LARGE}" alt="شعار معهد المجد"><div class="auth-product">أداء <span>|</span> ADAA<small>بوابة متابعة الأداء التعليمي</small></div><h1>رعايةٌ واعية<br>لأهل القرآن</h1><p>منظومة متكاملة لمتابعة جودة التعليم، وتقدير أثره، ومساندة المعلم في رحلته التربوية.</p><div class="auth-values"><div class="auth-value">${icon('check')} تقييم يومي بمعايير واضحة وعادلة</div><div class="auth-value">${icon('check')} متابعة النمو التربوي والتعليمي</div><div class="auth-value">${icon('check')} حفظ منظم للملفات والتقارير</div></div></div>
+    <div class="auth-form-panel"><h2>مرحبًا بعودتك</h2><p class="auth-lead">سجّل الدخول إلى بوابة متابعة الأداء.</p><form class="auth-form" id="login-form"><div class="field"><label for="username">اسم المستخدم</label><input id="username" name="username" autocomplete="username" required placeholder="أدخل اسم المستخدم"></div><div class="field"><label for="password">كلمة المرور</label><input id="password" name="password" type="password" autocomplete="current-password" required placeholder="أدخل كلمة المرور"></div><button class="btn btn-primary" type="submit">تسجيل الدخول ${icon('arrow')}</button><div id="auth-message">${message?`<div class="flash error">${esc(message)}</div>`:''}</div></form><div class="auth-lock">${icon('shield')} وصول خاص بحسابي الإدارة المعتمدين</div></div></section></main>`;
 }
 function renderSetup(message='') {
-  app.innerHTML=`<main class="auth-screen"><section class="auth-layout"><div class="auth-brand-panel"><img class="auth-logo" src="${BRAND_LOGO_LARGE}" alt="شعار مطبخ الإدارة المركزي"><div class="auth-product">مذاق <span>|</span> MATHAQ<small>بوابة إدارة أداء المطبخ التشغيلي</small></div><h1>الإعداد الأولي<br>للنظام</h1><p>أنشئ حسابَي الإدارة المعتمدين للبدء. لكل منصب حساب مستقل، وتُخزّن كلمة المرور بصورة تجزئة آمنة.</p><div class="auth-values"><div class="auth-value">${icon('shield')} صلاحيات منفصلة داخل النظام</div><div class="auth-value">${icon('check')} لا يمكن إضافة حساب إداري ثالث</div></div></div>
+  app.innerHTML=`<main class="auth-screen"><section class="auth-layout"><div class="auth-brand-panel"><img class="auth-logo" src="${BRAND_LOGO_LARGE}" alt="شعار معهد المجد"><div class="auth-product">أداء <span>|</span> ADAA<small>بوابة متابعة الأداء التعليمي</small></div><h1>الإعداد الأولي<br>للنظام</h1><p>أنشئ حسابَي الإدارة المعتمدين للبدء. لكل منصب حساب مستقل، وتُخزّن كلمة المرور بصورة تجزئة آمنة.</p><div class="auth-values"><div class="auth-value">${icon('shield')} صلاحيات منفصلة داخل النظام</div><div class="auth-value">${icon('check')} لا يمكن إضافة حساب إداري ثالث</div></div></div>
    <div class="auth-form-panel"><h2>إنشاء حسابَي الإدارة</h2><p class="auth-lead">أدخل اسمًا واسم مستخدم وكلمة مرور لكل منصب. الحد الأدنى لكلمة المرور 10 أحرف.</p><form id="setup-form" class="auth-form">
-   <div class="wizard-accounts"><div class="wizard-account"><div class="wizard-title">مدير المطبخ</div><div class="field"><label>الاسم</label><input name="chairName" required maxlength="100"></div><div class="field"><label>اسم المستخدم</label><input name="chairUsername" required minlength="3" autocomplete="username"></div><div class="field"><label>كلمة المرور</label><input name="chairPassword" type="password" required minlength="10" autocomplete="new-password"></div></div>
+   <div class="wizard-accounts"><div class="wizard-account"><div class="wizard-title">رئيس شؤون المعلمين والمعلمات</div><div class="field"><label>الاسم</label><input name="chairName" required maxlength="100"></div><div class="field"><label>اسم المستخدم</label><input name="chairUsername" required minlength="3" autocomplete="username"></div><div class="field"><label>كلمة المرور</label><input name="chairPassword" type="password" required minlength="10" autocomplete="new-password"></div></div>
    <div class="wizard-account"><div class="wizard-title">المدير العام</div><div class="field"><label>الاسم</label><input name="directorName" required maxlength="100"></div><div class="field"><label>اسم المستخدم</label><input name="directorUsername" required minlength="3" autocomplete="username"></div><div class="field"><label>كلمة المرور</label><input name="directorPassword" type="password" required minlength="10" autocomplete="new-password"></div></div></div>
    <div><button class="btn btn-primary" type="submit">حفظ الحسابين والبدء ${icon('arrow')}</button><div id="auth-message">${message?`<div class="flash error">${esc(message)}</div>`:''}</div></div></form></div></section></main>`;
 }
