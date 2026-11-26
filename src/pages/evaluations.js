@@ -1,10 +1,10 @@
 async function evaluationsPage() {
   const {teachers}=await api('/api/teachers');const {evaluations}=await api('/api/evaluations');
-  const canWrite=state.user.role==='chair';
-  const actions=canWrite?`<button id="delete-selected-evaluations" class="btn btn-danger" data-action="delete-selected-evaluations" disabled>حذف المحدد (0)</button><button class="btn btn-primary" data-action="open-evaluation-modal">${icon('plus')} إدخال تقييم</button>`:'';
+  const canAdd=state.user.role==='chair'||state.user.role==='director';const canDelete=state.user.role==='chair';
+  const actions=canAdd?`${canDelete?'<button id="delete-selected-evaluations" class="btn btn-danger" data-action="delete-selected-evaluations" disabled>حذف المحدد (0)</button>':''}<button class="btn btn-primary" data-action="open-evaluation-modal">${icon('plus')} إدخال تقييم</button>`:'';
   return `${pageHeading('التقييمات اليومية','سجل الدرجات والمعايير والتوجيهات لكل يوم.',actions)}
     <div class="toolbar"><div class="field"><label>بحث بالمدرس</label><input id="evaluation-search" placeholder="اسم المدرس" autocomplete="off"></div><div class="field"><label>من تاريخ</label><input id="evaluation-from" type="date"></div><div class="field"><label>إلى تاريخ</label><input id="evaluation-to" type="date"></div><button class="btn btn-secondary" data-action="filter-evaluations">${icon('search')} تطبيق</button><span class="toolbar-spacer"></span><span class="record-muted" id="evaluation-count">${evaluations.length} تقييمًا</span></div>
-    <article class="card table-card"><div class="table-wrap"><table class="data-table"><thead><tr>${canWrite?'<th class="eval-select-cell"><input id="select-all-evaluations" class="evaluation-select" type="checkbox" aria-label="تحديد كل التقييمات المعروضة"></th>':''}<th>التاريخ</th><th>المدرس</th><th>المجموع</th><th>التقدير</th><th>المقيّم</th><th>المدير العام</th><th>الإجراء</th></tr></thead><tbody id="evaluation-rows">${evaluationRows(evaluations,teachers)}</tbody></table></div></article>`;
+    <article class="card table-card"><div class="table-wrap"><table class="data-table"><thead><tr>${canDelete?'<th class="eval-select-cell"><input id="select-all-evaluations" class="evaluation-select" type="checkbox" aria-label="تحديد كل التقييمات المعروضة"></th>':''}<th>التاريخ</th><th>المدرس</th><th>المجموع</th><th>التقدير</th><th>المقيّم</th><th>المدير العام</th><th>الإجراء</th></tr></thead><tbody id="evaluation-rows">${evaluationRows(evaluations,teachers)}</tbody></table></div></article>`;
 }
 function evaluationRows(evaluations) {
   const canDelete=state.user.role==='chair';
