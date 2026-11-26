@@ -50,6 +50,7 @@ function initial(name='') { return [...String(name).trim()][0]||'م'; }
 function teacherAvatar(name,cls='teacher-initial') { return `<span class="${cls}">${esc(initial(name))}</span>`; }
 function toast(message,type='') { const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=message;document.getElementById('toast-region').append(el);setTimeout(()=>el.remove(),3800); }
 const SUPABASE_FUNCTION_URL='https://umxznkskctubakjyjqpv.supabase.co/functions/v1/adaa-api';
+const CRITERIA_FUNCTION_URL='https://umxznkskctubakjyjqpv.supabase.co/functions/v1/adaa-criteria';
 
 
 
@@ -72,4 +73,11 @@ async function api(path,options={}) {
   })();
   if(isGet)apiInflight.set(path,request);
   try{return await request;}finally{if(isGet&&apiInflight.get(path)===request)apiInflight.delete(path);}
+}
+async function criteriaApi(path,options={}) {
+  const session=localStorage.getItem('adaa_session');
+  const response=await fetch(CRITERIA_FUNCTION_URL+path,{...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(session?{'x-adaa-session':session}:{}),...(options.headers||{})}});
+  const type=response.headers.get('Content-Type')||'';const result=type.includes('json')?await response.json():{};
+  if(!response.ok)throw new Error(result.error||'تعذر إدارة خيارات التقييم.');
+  return result;
 }

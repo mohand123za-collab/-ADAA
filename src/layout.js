@@ -5,6 +5,7 @@ function navItems() { return [
   {key:'warnings',label:'سجل الإنذارات',icon:'bell',count:state.dashboard?.warningCount||0},
   {key:'reports',label:'التقارير',icon:'report'},
   {key:'directives',label:'التوجيهات الإدارية',icon:'message'},
+  ...(state.user?.role==='director'?[{key:'administration',label:'الإدارة',icon:'shield'}]:[]),
 ]; }
 function pageTitle() { const item=navItems().find(x=>x.key===state.page);if(item)return item.label;if(state.page==='profile')return 'ملف المدرس';return 'لوحة التحكم'; }
 function shell(content) {
@@ -42,7 +43,7 @@ async function boot() {
     const session=await api('/api/session');criteria=session.criteria||criteriaDefaults;
     if(session.setupRequired){renderSetup();return;}
     if(!session.user){renderLogin();return;}
-    state.user=session.user;await renderPage();
+    state.user=session.user;try{const configured=await criteriaApi('/api/criteria');if(configured.criteria?.length)criteria=configured.criteria;}catch(error){if(!session.user)throw error;}await renderPage();
   } catch(error) { renderLogin(error.message); }
 }
 function renderLogin(message='') {
@@ -71,6 +72,7 @@ async function renderPage() {
   else if(state.page==='warnings')content=await warningsPage();
   else if(state.page==='reports')content=await reportsPage();
   else if(state.page==='directives')content=await directivesPage();
+  else if(state.page==='administration')content=await administrationPage();
   else {state.page='dashboard';content=await dashboardPage();}
   if(version!==renderVersion||!state.user)return;
   app.innerHTML=shell(content);

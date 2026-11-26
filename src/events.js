@@ -45,7 +45,7 @@ document.addEventListener('change',e=>{if(e.target.id==='dashboard-period'){stat
   if(e.target.matches('#evaluation-form [name="date"]'))refreshTeacherChoices(e.target.value).catch(error=>toast(error.message,'error'));
 });
 document.addEventListener('click',async e=>{
-  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','delete-evaluation','delete-selected-evaluations','open-administrative-directive','respond-administrative-directive','create-administrative-directive','save-administrative-directive-response']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
+  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','delete-evaluation','delete-selected-evaluations','open-administrative-directive','respond-administrative-directive','create-administrative-directive','save-administrative-directive-response','add-criterion','edit-criterion','delete-criterion','save-criterion']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
   try{
     if(action==='navigate'){state.page=el.dataset.page;state.mobileOpen=false;state.teacherId=null;await renderPage();}
     else if(action==='toggle-menu'){state.mobileOpen=!state.mobileOpen;document.getElementById('sidebar')?.classList.toggle('open',state.mobileOpen);}
@@ -98,6 +98,17 @@ document.addEventListener('click',async e=>{
     else if(action==='save-administrative-directive-response'){
       if(state.modalBusy)return;const form=document.getElementById('administrative-directive-response-form');if(!form.reportValidity())return;state.modalBusy=true;el.disabled=true;const fd=new FormData(form);
       try{await api(`/api/directives/${el.dataset.id}`,{method:'PUT',body:JSON.stringify({status:fd.get('status'),response:fd.get('response')})});state.modalBusy=false;state.modal='';toast('تم حفظ الرد وتحديث حالة التنفيذ.');await renderPage();}
+      catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
+    }
+    else if(action==='add-criterion')openCriterionModal();
+    else if(action==='edit-criterion')openCriterionModal({id:el.dataset.id,label:el.dataset.label,max:el.dataset.max});
+    else if(action==='delete-criterion'){
+      if(!window.confirm(`حذف خيار التقييم «${el.dataset.label}»؟ لن يتأثر سجل التقييمات السابقة.`))return;
+      await criteriaApi(`/api/criteria/${el.dataset.id}`,{method:'DELETE'});toast('تم حذف خيار التقييم.');await renderPage();
+    }
+    else if(action==='save-criterion'){
+      if(state.modalBusy)return;const form=document.getElementById('criterion-form');if(!form.reportValidity())return;state.modalBusy=true;el.disabled=true;const fd=new FormData(form);const body={label:String(fd.get('label')||'').trim(),max:Number(fd.get('max'))};
+      try{await criteriaApi(el.dataset.id?`/api/criteria/${el.dataset.id}`:'/api/criteria',{method:el.dataset.id?'PUT':'POST',body:JSON.stringify(body)});state.modalBusy=false;state.modal='';document.querySelector('.modal-backdrop')?.remove();toast('تم حفظ خيار التقييم.');await renderPage();}
       catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
     }
     else if(action==='open-profile'){state.teacherId=el.dataset.id;state.page='profile';await renderPage();}
