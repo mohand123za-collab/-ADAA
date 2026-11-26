@@ -1,13 +1,13 @@
 function navItems() { return [
   {key:'dashboard',label:'لوحة التحكم',icon:'grid'},
-  {key:'teachers',label:'ملفات المدرسين',icon:'people'},
+  {key:'teachers',label:'ملفات المعلمين والمعلمات',icon:'people'},
   {key:'evaluations',label:'التقييمات اليومية',icon:'clipboard'},
   {key:'warnings',label:'سجل الإنذارات',icon:'bell',count:state.dashboard?.warningCount||0},
   {key:'reports',label:'التقارير',icon:'report'},
   {key:'directives',label:'التوجيهات الإدارية',icon:'message'},
   ...(state.user?.role==='director'?[{key:'administration',label:'الإدارة',icon:'shield'}]:[]),
 ]; }
-function pageTitle() { const item=navItems().find(x=>x.key===state.page);if(item)return item.label;if(state.page==='profile')return 'ملف المدرس';return 'لوحة التحكم'; }
+function pageTitle() { const item=navItems().find(x=>x.key===state.page);if(item)return item.label;if(state.page==='profile')return 'ملف المعلم';return 'لوحة التحكم'; }
 function shell(content) {
   const nav=navItems().map(item=>`<button class="nav-btn ${state.page===item.key||state.page==='profile'&&item.key==='teachers'?'active':''}" data-action="navigate" data-page="${item.key}">${icon(item.icon)}<span>${item.label}</span>${item.count?`<span class="nav-count">${item.count>9?'9+':item.count}</span>`:''}</button>`).join('');
   const date=new Intl.DateTimeFormat('ar-EG',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date());
