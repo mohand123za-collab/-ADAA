@@ -5,7 +5,7 @@ function navItems() { return [
   {key:'warnings',label:'سجل الإنذارات',icon:'bell',count:state.dashboard?.warningCount||0},
   {key:'reports',label:'التقارير',icon:'report'},
   {key:'directives',label:'التوجيهات الإدارية',icon:'message'},
-  ...(state.user?.role==='director'?[{key:'administration',label:'الإدارة',icon:'shield'}]:[]),
+  ...(state.user?.role==='director'||state.user?.role==='chair'?[{key:'administration',label:'الإدارة',icon:'shield'}]:[]),
 ]; }
 function pageTitle() { const item=navItems().find(x=>x.key===state.page);if(item)return item.label;if(state.page==='profile')return 'ملف المعلم';return 'لوحة التحكم'; }
 function shell(content) {

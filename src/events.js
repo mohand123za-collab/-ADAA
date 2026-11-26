@@ -45,7 +45,7 @@ document.addEventListener('change',e=>{if(e.target.id==='dashboard-period'){stat
   if(e.target.matches('#evaluation-form [name="date"]'))refreshTeacherChoices(e.target.value).catch(error=>toast(error.message,'error'));
 });
 document.addEventListener('click',async e=>{
-  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','delete-evaluation','delete-selected-evaluations','open-administrative-directive','respond-administrative-directive','create-administrative-directive','save-administrative-directive-response','add-criterion','edit-criterion','delete-criterion','save-criterion']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
+  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action;if(el.dataset.busy==='1')return;const instantActions=new Set(['navigate','open-teacher-modal','open-evaluation-modal','edit-teacher','edit-evaluation','save-teacher','save-evaluation','delete-teacher','save-directive','warning-review','load-report','export-csv','filter-evaluations','delete-evaluation','delete-selected-evaluations','open-administrative-directive','respond-administrative-directive','create-administrative-directive','save-administrative-directive-response','edit-administrative-directive','delete-administrative-directive','save-administrative-directive','add-criterion','edit-criterion','delete-criterion','save-criterion']);if(instantActions.has(action)){el.dataset.busy='1';el.classList.add('is-busy');el.setAttribute('aria-busy','true');}
   try{
     if(action==='navigate'){state.page=el.dataset.page;state.mobileOpen=false;state.teacherId=null;await renderPage();}
     else if(action==='toggle-menu'){state.mobileOpen=!state.mobileOpen;document.getElementById('sidebar')?.classList.toggle('open',state.mobileOpen);}
@@ -89,10 +89,20 @@ document.addEventListener('click',async e=>{
       catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
     }
     else if(action==='open-administrative-directive')await openAdministrativeDirectiveModal();
+    else if(action==='edit-administrative-directive')await openAdministrativeDirectiveModal(el.dataset.id);
     else if(action==='respond-administrative-directive')await openAdministrativeDirectiveResponse(el.dataset.id);
     else if(action==='create-administrative-directive'){
       if(state.modalBusy)return;const form=document.getElementById('administrative-directive-form');if(!form.reportValidity())return;state.modalBusy=true;el.disabled=true;const fd=new FormData(form);
       try{await api('/api/directives',{method:'POST',body:JSON.stringify({content:fd.get('content'),teacherId:fd.get('teacherId')||null})});state.modalBusy=false;state.modal='';toast('تم إرسال التوجيه الإداري وحفظه.');await renderPage();}
+      catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
+    }
+    else if(action==='delete-administrative-directive'){
+      if(!window.confirm('حذف هذا التوجيه الإداري؟ لا يمكن التراجع عن الحذف.'))return;
+      await api(`/api/directives/${el.dataset.id}`,{method:'DELETE'});toast('تم حذف التوجيه الإداري.');await renderPage();
+    }
+    else if(action==='save-administrative-directive'){
+      if(state.modalBusy)return;const form=document.getElementById('administrative-directive-form');if(!form.reportValidity())return;state.modalBusy=true;el.disabled=true;const fd=new FormData(form);
+      try{await api(`/api/directives/${el.dataset.id}`,{method:'PUT',body:JSON.stringify({content:fd.get('content'),teacherId:fd.get('teacherId')||null})});state.modalBusy=false;state.modal='';document.querySelector('.modal-backdrop')?.remove();toast('تم تعديل التوجيه الإداري.');await renderPage();}
       catch(error){state.modalBusy=false;el.disabled=false;document.getElementById('form-error').innerHTML=`<div class="flash error">${esc(error.message)}</div>`;}
     }
     else if(action==='save-administrative-directive-response'){

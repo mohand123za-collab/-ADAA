@@ -9,10 +9,12 @@ async function openTeacherModal(id=null) {
   app.insertAdjacentHTML('beforeend',state.modal);state.modal='';
 }
 
-async function openAdministrativeDirectiveModal() {
-  const {teachers=[]}=await api('/api/teachers');
-  const content=`<form id="administrative-directive-form"><div class="field"><label for="directive-teacher">المستلم</label><select id="directive-teacher" name="teacherId"><option value="">توجيه عام لرئيس الشؤون</option>${teachers.map(t=>`<option value="${t.id}">${esc(t.name)} · ${esc(t.gender)}</option>`).join('')}</select><small class="record-muted">اختر مدرسًا لجعل التوجيه خاصًا به، أو اترك الاختيار توجيهًا عامًا.</small></div><div class="field" style="margin-top:14px"><label for="administrative-directive-content">نص التوجيه *</label><textarea id="administrative-directive-content" name="content" maxlength="4000" required placeholder="اكتب التوجيه الإداري…"></textarea></div><div id="form-error"></div></form>`;
-  app.insertAdjacentHTML('beforeend',modalWrap('إرسال توجيه إداري',content,`<button class="btn btn-primary" data-action="create-administrative-directive">إرسال التوجيه</button><button class="btn btn-secondary" data-action="close-modal">إلغاء</button>`));
+async function openAdministrativeDirectiveModal(id=null) {
+  const {teachers=[]}=await api('/api/teachers');let directive=null;
+  if(id){const data=await api('/api/directives');directive=(data.directives||[]).find(item=>Number(item.id)===Number(id));if(!directive){toast('لم يتم العثور على التوجيه.','error');return;}}
+  const content=`<form id="administrative-directive-form"><div class="field"><label for="directive-teacher">المستلم</label><select id="directive-teacher" name="teacherId"><option value="">توجيه عام لرئيس الشؤون</option>${teachers.map(t=>`<option value="${t.id}" ${Number(directive?.teacherId)===Number(t.id)?'selected':''}>${esc(t.name)} · ${esc(t.gender)}</option>`).join('')}</select><small class="record-muted">اختر مدرسًا لجعل التوجيه خاصًا به، أو اترك الاختيار توجيهًا عامًا.</small></div><div class="field" style="margin-top:14px"><label for="administrative-directive-content">نص التوجيه *</label><textarea id="administrative-directive-content" name="content" maxlength="4000" required placeholder="اكتب التوجيه الإداري…">${esc(directive?.content||'')}</textarea></div><div id="form-error"></div></form>`;
+  const action=id?'save-administrative-directive':'create-administrative-directive';const label=id?'حفظ التعديل':'إرسال التوجيه';
+  app.insertAdjacentHTML('beforeend',modalWrap(id?'تعديل التوجيه الإداري':'إرسال توجيه إداري',content,`<button class="btn btn-primary" data-action="${action}" data-id="${id||''}">${label}</button><button class="btn btn-secondary" data-action="close-modal">إلغاء</button>`));
 }
 async function openAdministrativeDirectiveResponse(id) {
   const {directives=[]}=await api('/api/directives');const directive=directives.find(item=>Number(item.id)===Number(id));
